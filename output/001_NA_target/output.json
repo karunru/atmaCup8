@@ -1,0 +1,117 @@
+{
+    "seed_everything": 1031,
+    "pre_process": {
+        "do": false,
+        "col": "",
+        "xentropy": false
+    },
+    "post_process": {
+        "params": {},
+        "do": false,
+        "col": ""
+    },
+    "stacking": {},
+    "dataset": {
+        "dir": "input/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "feature_engineering": {
+        "sampling": {
+            "make": {
+                "params": {}
+            },
+            "save": {
+                "params": {}
+            },
+            "train": {
+                "params": {}
+            }
+        }
+    },
+    "av": {
+        "params": {},
+        "split_params": {},
+        "model_params": {},
+        "train_params": {}
+    },
+    "model": {
+        "name": "xgb",
+        "sampling": {
+            "name": "none",
+            "params": {}
+        },
+        "adaptive_learning_rate": {},
+        "focal_loss": {},
+        "model_params": {
+            "objective": "reg:squarederror",
+            "booster": "gbtree",
+            "eval_metric": "rmse",
+            "tree_method": "gpu_hist",
+            "max_depth": 6,
+            "learning_rate": 0.01,
+            "n_estimators": 10000,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "colsample_bytree": 0.8,
+            "colsample_bylevel": 0.3,
+            "reg_alpha": 0.0,
+            "reg_lambda": 1.0,
+            "verbosity": 0,
+            "seed": 1031,
+            "random_state": 1031
+        },
+        "train_params": {
+            "early_stopping_rounds": 200,
+            "verbose": true
+        },
+        "mode": "regression"
+    },
+    "val": {
+        "name": "stratified_group_kfold",
+        "params": {
+            "group": "Publisher",
+            "target": "group",
+            "n_splits": 5,
+            "random_state": 1031
+        },
+        "percentile": 95
+    },
+    "output_dir": "output",
+    "features": [
+        "Basic"
+    ],
+    "target": "NA_Sales",
+    "args": {
+        "config": "config/001_NA_target.yml"
+    },
+    "model_output_dir": "output/001_NA_target",
+    "categorical_cols": [],
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 1.2208339199395284,
+            "cv_score": {
+                "cv1": 1.105749,
+                "cv2": 1.483657,
+                "cv3": 1.12012,
+                "cv4": 1.226209,
+                "cv5": 1.107543
+            },
+            "n_data": 8359,
+            "best_iteration": 2527.3999999999996,
+            "n_features": 10,
+            "feature_importance": {
+                "Rating": 0.18309465050697327,
+                "Platform": 0.17121657729148865,
+                "Year_of_Release": 0.11932356655597687,
+                "User_Count": 0.09766048938035965,
+                "Critic_Count": 0.09069253504276276,
+                "Genre": 0.08160412311553955,
+                "Name": 0.07523691654205322,
+                "Critic_Score": 0.06911960989236832,
+                "Developer": 0.06181417033076286,
+                "User_Score": 0.050237350165843964
+            }
+        }
+    }
+}

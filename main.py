@@ -255,6 +255,7 @@ if __name__ == "__main__":
                 np.log1p(x_train["target"]),
                 q=[0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0],
                 labels=False,
+                duplicates="drop"
             )
             splits = get_validation(x_train, config)
             del x_train["target"], x_train["group"], x_train["Publisher"]
