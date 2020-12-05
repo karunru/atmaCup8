@@ -1,0 +1,4 @@
+extension: "pkl"
+
+input_dir: "input/atmaCup7/"
+output_dir: "input/atmaCup7/"
