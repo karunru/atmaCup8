@@ -63,7 +63,13 @@ class BaseModel(object):
     ) -> Tuple[
         np.ndarray, np.ndarray, np.ndarray, Optional[np.ndarray], Optional[np.ndarray]
     ]:
-        return y_train, oof_preds, test_preds, y_valid, valid_preds
+        return (
+            np.expm1(y_train),
+            np.expm1(oof_preds),
+            np.expm1(test_preds),
+            np.expm1(y_valid) if y_valid is not None else None,
+            np.expm1(valid_preds) if y_valid is not None else None
+        )
 
     def cv(
         self,
@@ -111,6 +117,8 @@ class BaseModel(object):
                     y_trn = y[trn_idx]
                     x_val = X_train.iloc[val_idx]
                     y_val = y[val_idx]
+                    logging.info(f"train size: {x_trn.shape}, valid size: {x_val.shape}")
+                    print(f"train size: {x_trn.shape}, valid size: {x_val.shape}")
 
                 with timer("get sampling"):
                     x_trn, y_trn = get_sampling(x_trn, y_trn, config)

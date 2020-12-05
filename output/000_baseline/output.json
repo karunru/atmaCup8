@@ -1,0 +1,117 @@
+{
+    "seed_everything": 1031,
+    "pre_process": {
+        "do": false,
+        "col": "",
+        "xentropy": false
+    },
+    "post_process": {
+        "params": {},
+        "do": false,
+        "col": ""
+    },
+    "stacking": {},
+    "dataset": {
+        "dir": "input/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "feature_engineering": {
+        "sampling": {
+            "make": {
+                "params": {}
+            },
+            "save": {
+                "params": {}
+            },
+            "train": {
+                "params": {}
+            }
+        }
+    },
+    "av": {
+        "params": {},
+        "split_params": {},
+        "model_params": {},
+        "train_params": {}
+    },
+    "model": {
+        "name": "xgb",
+        "sampling": {
+            "name": "none",
+            "params": {}
+        },
+        "adaptive_learning_rate": {},
+        "focal_loss": {},
+        "model_params": {
+            "objective": "reg:squarederror",
+            "booster": "gbtree",
+            "eval_metric": "rmse",
+            "tree_method": "gpu_hist",
+            "max_depth": 6,
+            "learning_rate": 0.01,
+            "n_estimators": 10000,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "colsample_bytree": 0.8,
+            "colsample_bylevel": 0.3,
+            "reg_alpha": 0.0,
+            "reg_lambda": 1.0,
+            "verbosity": 0,
+            "seed": 1031,
+            "random_state": 1031
+        },
+        "train_params": {
+            "early_stopping_rounds": 200,
+            "verbose": true
+        },
+        "mode": "regression"
+    },
+    "val": {
+        "name": "stratified_group_kfold",
+        "params": {
+            "group": "Publisher",
+            "target": "group",
+            "n_splits": 5,
+            "random_state": 1031
+        },
+        "percentile": 95
+    },
+    "output_dir": "output",
+    "features": [
+        "Basic"
+    ],
+    "target": "Global_Sales",
+    "args": {
+        "config": "config/000_baseline.yml"
+    },
+    "model_output_dir": "output/000_baseline",
+    "categorical_cols": [],
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 1.0964379079893465,
+            "cv_score": {
+                "cv1": 1.320721,
+                "cv2": 1.01672,
+                "cv3": 1.053279,
+                "cv4": 1.040284,
+                "cv5": 0.989347
+            },
+            "n_data": 8359,
+            "best_iteration": 1700.8000000000002,
+            "n_features": 10,
+            "feature_importance": {
+                "User_Count": 0.14866237342357635,
+                "Year_of_Release": 0.14543768763542175,
+                "Platform": 0.13774648308753967,
+                "Critic_Count": 0.1237175464630127,
+                "Rating": 0.09218788892030716,
+                "Critic_Score": 0.08506346493959427,
+                "Genre": 0.07810590416193008,
+                "Name": 0.07148534059524536,
+                "User_Score": 0.06107262521982193,
+                "Developer": 0.05652069300413132
+            }
+        }
+    }
+}

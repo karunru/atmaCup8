@@ -11,5 +11,9 @@ from .seed_everything import seed_everything
 from .slack import slack_notify
 from .timer import timer
 from .tools import reduce_mem_usage
-from .visualization import (plot_confusion_matrix, plot_feature_importance,
-                            plot_slide_window_split_by_day_indices)
+from .visualization import (
+    plot_confusion_matrix,
+    plot_feature_importance,
+    plot_venn2,
+    plot_slide_window_split_by_day_indices,
+)
