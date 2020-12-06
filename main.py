@@ -22,7 +22,7 @@ from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
                    SpearmanCorrelationEliminator)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import Basic, generate_features, load_features
+from src.features import Basic, GroupbyName, generate_features, load_features
 from src.models import get_model
 from src.utils import (configure_logger, delete_duplicated_columns,
                        feature_existence_checker, get_preprocess_parser,
@@ -79,8 +79,8 @@ if __name__ == "__main__":
 
     if (not feature_existence_checker(feature_dir, config["features"])) or args.force:
         with timer(name="load data"):
-            train = cudf.read_feather(input_dir / "train.ftr")
-            test = cudf.read_feather(input_dir / "test.ftr")
+            train = cudf.read_feather(feature_dir / "Basic_train.ftr")
+            test = cudf.read_feather(feature_dir / "Basic_test.ftr")
         with timer(name="generate features"):
             generate_features(
                 train_df=train,
@@ -148,25 +148,28 @@ if __name__ == "__main__":
     # === Feature Selection
     # ===============================
     with timer("Feature Selection"):
-        # with timer("Feature Selection by ConstantFeatureEliminator"):
-        #     selector = ConstantFeatureEliminator()
-        #     x_train = selector.fit_transform(x_train)
-        #     x_test = selector.transform(x_test)
-        #     assert len(x_train.columns) == len(x_test.columns)
-        #     logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
-        #     cols = x_train.columns.tolist()
-        #
-        # with timer("Feature Selection by SpearmanCorrelationEliminator"):
-        #     selector = SpearmanCorrelationEliminator(threshold=0.995)
-        #     x_train = selector.fit_transform(x_train)
-        #     x_test = selector.transform(x_test)
-        #     assert len(x_train.columns) == len(x_test.columns)
-        #     logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
-        #     cols = x_train.columns.tolist()
+        with timer("Feature Selection by ConstantFeatureEliminator"):
+            selector = ConstantFeatureEliminator()
+            x_train = selector.fit_transform(x_train)
+            x_test = selector.transform(x_test)
+            assert len(x_train.columns) == len(x_test.columns)
+            logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
+            cols = x_train.columns.tolist()
+
+        with timer("Feature Selection by SpearmanCorrelationEliminator"):
+            selector = SpearmanCorrelationEliminator(threshold=0.995)
+            x_train = selector.fit_transform(x_train)
+            x_test = selector.transform(x_test)
+            assert len(x_train.columns) == len(x_test.columns)
+            logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
+            cols = x_train.columns.tolist()
 
         # with timer("Feature Selection with Kolmogorov-Smirnov statistic"):
-        #     number_cols = x_train[cols].select_dtypes(include='number').columns
-        #     to_remove = remove_ks_features(x_train[number_cols], x_test[number_cols], number_cols)
+        #     number_cols = x_train[cols].select_dtypes(include="number").columns
+        #     to_remove = remove_ks_features(
+        #         x_train[number_cols], x_test[number_cols], number_cols
+        #     )
+        #     logging.info(f"Removed features : {to_remove}")
         #     cols = [col for col in cols if col not in to_remove]
 
         cols = x_train.columns.tolist()
@@ -255,7 +258,7 @@ if __name__ == "__main__":
                 np.log1p(x_train["target"]),
                 q=[0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0],
                 labels=False,
-                duplicates="drop"
+                duplicates="drop",
             )
             splits = get_validation(x_train, config)
             del x_train["target"], x_train["group"], x_train["Publisher"]

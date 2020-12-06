@@ -1,0 +1,181 @@
+{
+    "seed_everything": 1031,
+    "pre_process": {
+        "do": false,
+        "col": "",
+        "xentropy": false
+    },
+    "post_process": {
+        "params": {},
+        "do": false,
+        "col": ""
+    },
+    "stacking": {},
+    "dataset": {
+        "dir": "input/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "feature_engineering": {
+        "sampling": {
+            "make": {
+                "params": {}
+            },
+            "save": {
+                "params": {}
+            },
+            "train": {
+                "params": {}
+            }
+        }
+    },
+    "av": {
+        "params": {},
+        "split_params": {},
+        "model_params": {},
+        "train_params": {}
+    },
+    "model": {
+        "name": "xgb",
+        "sampling": {
+            "name": "none",
+            "params": {}
+        },
+        "adaptive_learning_rate": {},
+        "focal_loss": {},
+        "model_params": {
+            "objective": "reg:squarederror",
+            "booster": "gbtree",
+            "eval_metric": "rmse",
+            "tree_method": "gpu_hist",
+            "max_depth": 6,
+            "learning_rate": 0.01,
+            "n_estimators": 10000,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "colsample_bytree": 0.8,
+            "colsample_bylevel": 0.3,
+            "reg_alpha": 0.0,
+            "reg_lambda": 1.0,
+            "verbosity": 0,
+            "seed": 1031,
+            "random_state": 1031
+        },
+        "train_params": {
+            "early_stopping_rounds": 200,
+            "verbose": true
+        },
+        "mode": "regression"
+    },
+    "val": {
+        "name": "stratified_group_kfold",
+        "params": {
+            "group": "Publisher",
+            "target": "group",
+            "n_splits": 5,
+            "random_state": 1031
+        },
+        "percentile": 95
+    },
+    "output_dir": "output",
+    "features": [
+        "Basic",
+        "GroupbyName"
+    ],
+    "target": "Global_Sales",
+    "args": {
+        "config": "config/002_add_groupby_name.yml"
+    },
+    "model_output_dir": "output/002_add_groupby_name",
+    "categorical_cols": [],
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 1.1090123451774838,
+            "cv_score": {
+                "cv1": 1.329606,
+                "cv2": 1.028119,
+                "cv3": 1.06322,
+                "cv4": 1.064237,
+                "cv5": 0.99983
+            },
+            "n_data": 8359,
+            "best_iteration": 1171.2,
+            "n_features": 73,
+            "feature_importance": {
+                "User_Count": 0.06622613966464996,
+                "Critic_Count": 0.05680214613676071,
+                "Year_of_Release": 0.050049521028995514,
+                "Platform": 0.04882248118519783,
+                "Critic_Score": 0.043518997728824615,
+                "Rating": 0.03529646247625351,
+                "User_Score": 0.03278829902410507,
+                "Genre": 0.026884576305747032,
+                "Developer": 0.019556190818548203,
+                "Name": 0.016848444938659668,
+                "ratio_nunique_Platform_groupby_Name": 0.011749071069061756,
+                "diff_std_Critic_Score_groupby_Name": 0.011200672015547752,
+                "ratio_std_Critic_Score_groupby_Name": 0.011129206977784634,
+                "ratio_sum_Critic_Count_groupby_Name": 0.011092997156083584,
+                "ratio_mean_Critic_Count_groupby_Name": 0.010646606795489788,
+                "ratio_min_Critic_Count_groupby_Name": 0.010637745261192322,
+                "ratio_max_User_Score_groupby_Name": 0.010483494028449059,
+                "diff_sum_User_Count_groupby_Name": 0.010475651361048222,
+                "ratio_std_User_Count_groupby_Name": 0.010451427660882473,
+                "sum_User_Score_groupby_Name": 0.010341170243918896,
+                "ratio_sum_User_Score_groupby_Name": 0.010323822498321533,
+                "sum_User_Count_groupby_Name": 0.010273130610585213,
+                "diff_std_Critic_Count_groupby_Name": 0.010249761864542961,
+                "max_User_Count_groupby_Name": 0.010175952687859535,
+                "diff_sum_Critic_Count_groupby_Name": 0.010160600766539574,
+                "ratio_mean_User_Count_groupby_Name": 0.010151133872568607,
+                "ratio_sum_Critic_Score_groupby_Name": 0.010147927328944206,
+                "ratio_max_Critic_Score_groupby_Name": 0.010124454274773598,
+                "ratio_sum_User_Count_groupby_Name": 0.010061327368021011,
+                "ratio_mean_Critic_Score_groupby_Name": 0.010053500533103943,
+                "max_User_Score_groupby_Name": 0.009998667985200882,
+                "ratio_mean_User_Score_groupby_Name": 0.009978671558201313,
+                "ratio_min_Critic_Score_groupby_Name": 0.009976265951991081,
+                "std_User_Count_groupby_Name": 0.009899917058646679,
+                "diff_min_Critic_Count_groupby_Name": 0.00987766869366169,
+                "ratio_max_User_Count_groupby_Name": 0.009870560839772224,
+                "diff_max_User_Count_groupby_Name": 0.009813010692596436,
+                "ratio_std_User_Score_groupby_Name": 0.009765618480741978,
+                "ratio_min_User_Count_groupby_Name": 0.009763965383172035,
+                "diff_std_User_Score_groupby_Name": 0.009734651073813438,
+                "ratio_std_Critic_Count_groupby_Name": 0.009722577407956123,
+                "mean_User_Count_groupby_Name": 0.00970887579023838,
+                "ratio_max_Critic_Count_groupby_Name": 0.009664489887654781,
+                "diff_max_User_Score_groupby_Name": 0.009555509313941002,
+                "sum_Critic_Count_groupby_Name": 0.009540942497551441,
+                "min_User_Count_groupby_Name": 0.009461048059165478,
+                "diff_std_User_Count_groupby_Name": 0.009447077289223671,
+                "mean_User_Score_groupby_Name": 0.009422321803867817,
+                "min_Critic_Count_groupby_Name": 0.009401352144777775,
+                "ratio_min_User_Score_groupby_Name": 0.009330159053206444,
+                "diff_min_Critic_Score_groupby_Name": 0.009315515868365765,
+                "diff_sum_Critic_Score_groupby_Name": 0.009279094636440277,
+                "diff_min_User_Count_groupby_Name": 0.009162373840808868,
+                "diff_sum_User_Score_groupby_Name": 0.009148714132606983,
+                "std_Critic_Count_groupby_Name": 0.009097312577068806,
+                "diff_min_User_Score_groupby_Name": 0.009062586352229118,
+                "min_User_Score_groupby_Name": 0.009058570489287376,
+                "diff_nunique_Platform_groupby_Name": 0.00905793346464634,
+                "diff_mean_User_Count_groupby_Name": 0.008985467255115509,
+                "mean_Critic_Count_groupby_Name": 0.008848698809742928,
+                "diff_max_Critic_Count_groupby_Name": 0.008825317025184631,
+                "max_Critic_Count_groupby_Name": 0.008792072534561157,
+                "diff_max_Critic_Score_groupby_Name": 0.00872696191072464,
+                "diff_mean_User_Score_groupby_Name": 0.00869281217455864,
+                "std_User_Score_groupby_Name": 0.008661314845085144,
+                "max_Critic_Score_groupby_Name": 0.008659257553517818,
+                "diff_mean_Critic_Count_groupby_Name": 0.008657719939947128,
+                "sum_Critic_Score_groupby_Name": 0.008655296638607979,
+                "diff_mean_Critic_Score_groupby_Name": 0.008268717676401138,
+                "min_Critic_Score_groupby_Name": 0.008068686351180077,
+                "std_Critic_Score_groupby_Name": 0.008051332086324692,
+                "mean_Critic_Score_groupby_Name": 0.007881676778197289,
+                "nunique_Platform_groupby_Name": 0.0063862972892820835
+            }
+        }
+    }
+}
