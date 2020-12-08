@@ -1,4 +1,4 @@
-from .arguments import get_parser, get_preprocess_parser
+from .arguments import get_parser, get_preprocess_parser, get_making_seed_average_parser
 from .checker import feature_existence_checker
 from .config import load_config
 from .dataframe import fast_concat, fast_merge, list_df_concat, merge_by_concat
