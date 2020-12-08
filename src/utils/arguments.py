@@ -36,3 +36,9 @@ def get_making_seed_average_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num_seeds", required=True, help="num seeds")
 
     return parser
+
+def get_seed_average_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", required=True, help="Base output file path")
+
+    return parser
