@@ -21,7 +21,7 @@ if __name__ == "__main__":
                 "seed_everything: &seed 1031", f"seed_everything: &seed {str(i)}"
             )
             seed_config = seed_config.replace(
-                'output_dir: "output"', f'output_dir: "output/{config_name}'
+                'output_dir: "output"', f'output_dir: "output/{config_name}"'
             )
             save_file_path = configs_dir / f"seed_{str(i).zfill(padding)}.yml"
             with open(save_file_path, "w") as f:

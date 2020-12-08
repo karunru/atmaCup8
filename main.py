@@ -312,4 +312,4 @@ if __name__ == "__main__":
 
     save_pickle(models, output_dir / "model.pkl")
 
-    slack_notify(config_name + "終わったぞ\n" + str(config))
+    # slack_notify(config_name + "終わったぞ\n" + str(config))
