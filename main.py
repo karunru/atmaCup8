@@ -22,7 +22,7 @@ from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
                    SpearmanCorrelationEliminator)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import Basic, GroupbyName, generate_features, load_features,GroupbyPublisher, GroupbyDeveloper
+from src.features import Basic, GroupbyName, generate_features, load_features,GroupbyPublisher, GroupbyDeveloper,GroupbyPlatform
 from src.models import get_model
 from src.utils import (configure_logger, delete_duplicated_columns,
                        feature_existence_checker, get_preprocess_parser,
