@@ -11,8 +11,12 @@ import pandas as pd
 from scipy.stats import ks_2samp
 from src.utils import load_pickle, logger, save_pickle
 from tqdm import tqdm
-from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
-                   Pipeline, SpearmanCorrelationEliminator)
+from xfeat import (
+    ConstantFeatureEliminator,
+    DuplicatedFeatureEliminator,
+    Pipeline,
+    SpearmanCorrelationEliminator,
+)
 from xfeat.base import SelectorMixin
 from xfeat.types import XDataFrame
 
@@ -104,11 +108,15 @@ class KarunruSpearmanCorrelationEliminator(SelectorMixin):
     """
 
     def __init__(
-        self, threshold=0.99, save_path=Path("./features/removed_feats_pairs.pkl")
+        self,
+        threshold=0.99,
+        dry_run=False,
+        save_path=Path("./features/removed_feats_pairs.pkl"),
     ):
         """[summary]."""
         self._selected_cols = []
         self._threshold = threshold
+        self.dry_run = dry_run
         self.save_path = save_path
 
     @staticmethod
@@ -135,6 +143,13 @@ class KarunruSpearmanCorrelationEliminator(SelectorMixin):
             else defaultdict(list)
         )
         removed_cols = sum(removed_cols_pairs.values(), [])
+        if self.dry_run:
+            self._selected_cols = [
+                col for col in org_cols if col not in set(removed_cols)
+            ]
+            return
+
+        org_cols = [col for col in org_cols if col not in removed_cols]
         counter = 0
         for i in tqdm(range(len(org_cols) - 1)):
             feat_a_name = org_cols[i]
@@ -154,10 +169,10 @@ class KarunruSpearmanCorrelationEliminator(SelectorMixin):
                     continue
 
                 feat_b = (
-                input_df[feat_b_name].to_pandas()
-                if isinstance(input_df, cudf.DataFrame)
-                else input_df[feat_b_name]
-            )
+                    input_df[feat_b_name].to_pandas()
+                    if isinstance(input_df, cudf.DataFrame)
+                    else input_df[feat_b_name]
+                )
                 c = np.corrcoef(feat_a, feat_b)[0][1]
 
                 if abs(c) > self._threshold:

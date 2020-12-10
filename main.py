@@ -160,7 +160,7 @@ if __name__ == "__main__":
             cols = x_train.columns.tolist()
 
         with timer("Feature Selection by SpearmanCorrelationEliminator"):
-            selector = KarunruSpearmanCorrelationEliminator(threshold=0.99)
+            selector = KarunruSpearmanCorrelationEliminator(threshold=0.99, dry_run=True)
             x_train = selector.fit_transform(x_train)
             x_test = selector.transform(x_test)
             assert len(x_train.columns) == len(x_test.columns)
