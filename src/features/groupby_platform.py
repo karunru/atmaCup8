@@ -76,7 +76,7 @@ class GroupbyPlatform(Feature):
 
         with timer("pivot_tables"):
             with timer("Publisher"):
-                count_platforms_groupby_publisher = cudf.from_pandas(
+                count_publishers_groupby_platform = cudf.from_pandas(
                     total.to_pandas()
                     .pivot_table(
                         index="Platform",
@@ -86,13 +86,13 @@ class GroupbyPlatform(Feature):
                     )
                     .reset_index()
                 ).fillna(0.0)
-                count_platforms_groupby_publisher.columns = ["Platform"] + [
-                    "count_platform_" + str(col) + "_groupby_publisher"
-                    for col in count_platforms_groupby_publisher.columns
+                count_publishers_groupby_platform.columns = ["Platform"] + [
+                    "count_publisher_" + str(col) + "_groupby_platform"
+                    for col in count_publishers_groupby_platform.columns
                     if str(col) != "Platform"
                 ]
                 total = cudf.merge(
-                    total, count_platforms_groupby_publisher, how="left", on="Platform"
+                    total, count_publishers_groupby_platform, how="left", on="Platform"
                 )
 
             with timer("Genre"):

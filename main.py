@@ -22,7 +22,9 @@ from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
                    SpearmanCorrelationEliminator)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import Basic, GroupbyName, generate_features, load_features,GroupbyPublisher, GroupbyDeveloper,GroupbyPlatform
+from src.features import (Basic, GroupbyDeveloper, GroupbyGenre, GroupbyName,
+                          GroupbyPlatform, GroupbyPublisher, generate_features,
+                          load_features)
 from src.models import get_model
 from src.utils import (configure_logger, delete_duplicated_columns,
                        feature_existence_checker, get_preprocess_parser,
@@ -33,6 +35,7 @@ from src.utils import (configure_logger, delete_duplicated_columns,
 from src.validation import (default_feature_selector, get_validation,
                             remove_correlated_features, remove_ks_features,
                             select_features)
+from src.validation.feature_selection import KarunruSpearmanCorrelationEliminator
 
 if __name__ == "__main__":
     # Set RMM to allocate all memory as managed memory (cudaMallocManaged underlying allocator)
@@ -157,7 +160,7 @@ if __name__ == "__main__":
             cols = x_train.columns.tolist()
 
         with timer("Feature Selection by SpearmanCorrelationEliminator"):
-            selector = SpearmanCorrelationEliminator(threshold=0.995)
+            selector = KarunruSpearmanCorrelationEliminator(threshold=0.99)
             x_train = selector.fit_transform(x_train)
             x_test = selector.transform(x_test)
             assert len(x_train.columns) == len(x_test.columns)
