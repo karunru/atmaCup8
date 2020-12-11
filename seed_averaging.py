@@ -2,6 +2,7 @@ import json
 from glob import glob
 from pathlib import Path
 
+import lightgbm as lgb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -9,6 +10,7 @@ import seaborn as sns
 from tqdm import tqdm
 
 from src.evaluation.metrics import rmsle
+from src.models.base import LGBModel
 from src.utils import (get_seed_average_parser, load_pickle, make_submission,
                        save_json)
 
@@ -46,11 +48,18 @@ if __name__ == "__main__":
     ):
         models = load_pickle(models_path)
         for i, model in enumerate(models):
-            importances_tmp = pd.DataFrame(
-                model.feature_importances_,
-                columns=[f"gain_{i + 1}_{seed}"],
-                index=feature_names,
-            )
+            if isinstance(model, lgb.basic.Booster):
+                importances_tmp = pd.DataFrame(
+                    model.feature_importance(importance_type="gain"),
+                    columns=[f"gain_{i + 1}_{seed}"],
+                    index=feature_names,
+                )
+            else:
+                importances_tmp = pd.DataFrame(
+                    model.feature_importances_,
+                    columns=[f"gain_{i + 1}_{seed}"],
+                    index=feature_names,
+                )
             importances = importances.join(importances_tmp, how="inner")
 
     feature_importance = importances.mean(axis=1)
