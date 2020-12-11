@@ -18,23 +18,49 @@ import seaborn as sns
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
-from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
-                   SpearmanCorrelationEliminator)
+from xfeat import (
+    ConstantFeatureEliminator,
+    DuplicatedFeatureEliminator,
+    SpearmanCorrelationEliminator,
+)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import (Basic, GroupbyDeveloper, GroupbyGenre, GroupbyName,
-                          GroupbyPlatform, GroupbyPublisher, generate_features,
-                          load_features)
+from src.features import (
+    Basic,
+    GroupbyDeveloper,
+    GroupbyGenre,
+    GroupbyName,
+    GroupbyYear,
+    GroupbyPlatform,
+    GroupbyPublisher,
+    generate_features,
+    load_features,
+)
 from src.models import get_model
-from src.utils import (configure_logger, delete_duplicated_columns,
-                       feature_existence_checker, get_preprocess_parser,
-                       load_config, load_pickle, make_submission,
-                       merge_by_concat, plot_feature_importance,
-                       reduce_mem_usage, save_json, save_pickle,
-                       seed_everything, slack_notify, timer)
-from src.validation import (default_feature_selector, get_validation,
-                            remove_correlated_features, remove_ks_features,
-                            select_features)
+from src.utils import (
+    configure_logger,
+    delete_duplicated_columns,
+    feature_existence_checker,
+    get_preprocess_parser,
+    load_config,
+    load_pickle,
+    make_submission,
+    merge_by_concat,
+    plot_feature_importance,
+    reduce_mem_usage,
+    save_json,
+    save_pickle,
+    seed_everything,
+    slack_notify,
+    timer,
+)
+from src.validation import (
+    default_feature_selector,
+    get_validation,
+    remove_correlated_features,
+    remove_ks_features,
+    select_features,
+)
 from src.validation.feature_selection import KarunruSpearmanCorrelationEliminator
 
 if __name__ == "__main__":
@@ -160,7 +186,9 @@ if __name__ == "__main__":
             cols = x_train.columns.tolist()
 
         with timer("Feature Selection by SpearmanCorrelationEliminator"):
-            selector = KarunruSpearmanCorrelationEliminator(threshold=0.99, dry_run=True)
+            selector = KarunruSpearmanCorrelationEliminator(
+                threshold=0.99, dry_run=False
+            )
             x_train = selector.fit_transform(x_train)
             x_test = selector.transform(x_test)
             assert len(x_train.columns) == len(x_test.columns)
