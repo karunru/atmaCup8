@@ -6,3 +6,4 @@ from .groupby_developer import GroupbyDeveloper
 from .groupby_platform import GroupbyPlatform
 from .groupby_genre import GroupbyGenre
 from .groupby_year import GroupbyYear
+from .groupby_rating import GroupbyRating

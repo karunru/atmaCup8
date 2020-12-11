@@ -30,9 +30,10 @@ from src.features import (
     GroupbyDeveloper,
     GroupbyGenre,
     GroupbyName,
-    GroupbyYear,
+    GroupbyRating,
     GroupbyPlatform,
     GroupbyPublisher,
+    GroupbyYear,
     generate_features,
     load_features,
 )
