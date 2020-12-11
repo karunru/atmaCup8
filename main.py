@@ -31,6 +31,7 @@ from src.features import (
     GroupbyGenre,
     GroupbyName,
     GroupbyRating,
+    CategoryVectorization,
     GroupbyPlatform,
     GroupbyPublisher,
     GroupbyYear,
@@ -188,7 +189,7 @@ if __name__ == "__main__":
 
         with timer("Feature Selection by SpearmanCorrelationEliminator"):
             selector = KarunruSpearmanCorrelationEliminator(
-                threshold=0.99, dry_run=True
+                threshold=0.99, dry_run=False
             )
             x_train = selector.fit_transform(x_train)
             x_test = selector.transform(x_test)
