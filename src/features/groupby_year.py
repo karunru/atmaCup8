@@ -16,7 +16,7 @@ num_var_list = [
     "User_Score",
     "User_Count",
 ]
-cat_var_list = ["Name", "Platform", "Publisher", "Developer", "Rating"]
+cat_var_list = ["Name", "Platform", "Genre", "Publisher", "Developer", "Rating"]
 num_stats_list = [
     "mean",
     "std",
