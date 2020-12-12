@@ -18,55 +18,26 @@ import seaborn as sns
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
-from xfeat import (
-    ConstantFeatureEliminator,
-    DuplicatedFeatureEliminator,
-    SpearmanCorrelationEliminator,
-)
+from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
+                   SpearmanCorrelationEliminator)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import (
-    AggSubTargetGroupbyTarget,
-    Basic,
-    CategoryVectorization,
-    ConcatCategory,
-    GroupbyConcatCat,
-    GroupbyDeveloper,
-    GroupbyGenre,
-    GroupbyName,
-    GroupbyPlatform,
-    GroupbyPublisher,
-    GroupbyRating,
-    GroupbyYear,
-    generate_features,
-    load_features,
-)
+from src.features import (AggSubTargetGroupbyTarget, Basic,
+                          CategoryVectorization, ConcatCategory,
+                          GroupbyConcatCat, GroupbyDeveloper, GroupbyGenre,
+                          GroupbyName, GroupbyPlatform, GroupbyPublisher,
+                          GroupbyRating, GroupbyYear, generate_features,
+                          load_features)
 from src.models import get_model
-from src.utils import (
-    configure_logger,
-    delete_duplicated_columns,
-    feature_existence_checker,
-    get_preprocess_parser,
-    load_config,
-    load_pickle,
-    make_submission,
-    merge_by_concat,
-    plot_feature_importance,
-    reduce_mem_usage,
-    save_json,
-    save_pickle,
-    seed_everything,
-    slack_notify,
-    timer,
-)
-from src.validation import (
-    default_feature_selector,
-    get_validation,
-    remove_correlated_features,
-    remove_ks_features,
-    select_features,
-)
-from src.validation.feature_selection import KarunruSpearmanCorrelationEliminator
+from src.utils import (configure_logger, delete_duplicated_columns,
+                       feature_existence_checker, get_preprocess_parser,
+                       load_config, load_pickle, make_submission,
+                       merge_by_concat, plot_feature_importance,
+                       reduce_mem_usage, save_json, save_pickle,
+                       seed_everything, slack_notify, timer)
+from src.validation import (default_feature_selector, get_validation,
+                            remove_correlated_features, remove_ks_features,KarunruSpearmanCorrelationEliminator,
+                            select_top_k_features)
 
 if __name__ == "__main__":
     # Set RMM to allocate all memory as managed memory (cudaMallocManaged underlying allocator)
@@ -184,31 +155,37 @@ if __name__ == "__main__":
     # === Feature Selection
     # ===============================
     with timer("Feature Selection"):
-        with timer("Feature Selection by ConstantFeatureEliminator"):
-            selector = ConstantFeatureEliminator()
-            x_train = selector.fit_transform(x_train)
-            x_test = selector.transform(x_test)
-            assert len(x_train.columns) == len(x_test.columns)
-            logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
-            cols = x_train.columns.tolist()
+        if config["feature_selection"]["top_k"]["do"]:
+            use_cols = select_top_k_features(config["feature_selection"]["top_k"]) + [
+                "Publisher"
+            ]
+            x_train, x_test = x_train[use_cols], x_test[use_cols]
+        else:
+            with timer("Feature Selection by ConstantFeatureEliminator"):
+                selector = ConstantFeatureEliminator()
+                x_train = selector.fit_transform(x_train)
+                x_test = selector.transform(x_test)
+                assert len(x_train.columns) == len(x_test.columns)
+                logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
+                cols = x_train.columns.tolist()
 
-        with timer("Feature Selection by SpearmanCorrelationEliminator"):
-            selector = KarunruSpearmanCorrelationEliminator(
-                threshold=0.99, dry_run=True
-            )
-            x_train = selector.fit_transform(x_train)
-            x_test = selector.transform(x_test)
-            assert len(x_train.columns) == len(x_test.columns)
-            logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
-            cols = x_train.columns.tolist()
+            with timer("Feature Selection by SpearmanCorrelationEliminator"):
+                selector = KarunruSpearmanCorrelationEliminator(
+                    threshold=0.99, dry_run=True
+                )
+                x_train = selector.fit_transform(x_train)
+                x_test = selector.transform(x_test)
+                assert len(x_train.columns) == len(x_test.columns)
+                logging.info(f"Removed features : {set(cols) - set(x_train.columns)}")
+                cols = x_train.columns.tolist()
 
-        # with timer("Feature Selection with Kolmogorov-Smirnov statistic"):
-        #     number_cols = x_train[cols].select_dtypes(include="number").columns
-        #     to_remove = remove_ks_features(
-        #         x_train[number_cols], x_test[number_cols], number_cols
-        #     )
-        #     logging.info(f"Removed features : {to_remove}")
-        #     cols = [col for col in cols if col not in to_remove]
+            # with timer("Feature Selection with Kolmogorov-Smirnov statistic"):
+            #     number_cols = x_train[cols].select_dtypes(include="number").columns
+            #     to_remove = remove_ks_features(
+            #         x_train[number_cols], x_test[number_cols], number_cols
+            #     )
+            #     logging.info(f"Removed features : {to_remove}")
+            #     cols = [col for col in cols if col not in to_remove]
 
         cols = x_train.columns.tolist()
         categorical_cols = x_train.select_dtypes(include="category").columns.tolist()

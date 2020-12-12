@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from abc import ABC
@@ -11,37 +12,43 @@ import pandas as pd
 from scipy.stats import ks_2samp
 from src.utils import load_pickle, logger, save_pickle
 from tqdm import tqdm
-from xfeat import (
-    ConstantFeatureEliminator,
-    DuplicatedFeatureEliminator,
-    Pipeline,
-    SpearmanCorrelationEliminator,
-)
+from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
+                   Pipeline, SpearmanCorrelationEliminator)
 from xfeat.base import SelectorMixin
 from xfeat.types import XDataFrame
 
 
-def select_features(
-    cols: List[str],
-    feature_importance: pd.DataFrame,
+def select_top_k_features(
     config: dict,
-    delete_higher_importance: bool = False,
 ) -> List[str]:
-    if config["val"].get("n_delete") is None:
-        return cols
 
-    n_delete = config["val"].get("n_delete")
-    importance_sorted_cols = feature_importance.sort_values(
-        by="value", ascending=not (delete_higher_importance)
-    )["feature"].tolist()
-    if isinstance(n_delete, int):
-        remove_cols = importance_sorted_cols[:n_delete]
-        cols = [col for col in cols if col not in remove_cols]
-    elif isinstance(n_delete, float):
-        n_delete_int = int(n_delete * len(importance_sorted_cols))
-        remove_cols = importance_sorted_cols[:n_delete_int]
-        cols = [col for col in cols if col not in remove_cols]
-    return cols
+    top_k = config.get("top_k")
+    importances_path = Path("./output") / config.get("importance") / "output.json"
+    with open(importances_path) as f:
+        importances_dict = json.load(f)
+
+    if "feature_importance" in importances_dict.keys():
+        importances_dict = importances_dict["feature_importance"]
+    elif "eval_results" in importances_dict.keys():
+        importances_dict = importances_dict["eval_results"]["eval_result"][
+            "feature_importance"
+        ]
+    else:
+        raise
+
+    importances_dict = {
+        k: v
+        for k, v in sorted(importances_dict.items(), key=lambda x: x[1], reverse=True)
+    }
+    importance_sorted_cols = [key for key in importances_dict.keys()]
+
+    if isinstance(top_k, int):
+        use_cols = importance_sorted_cols[:top_k]
+    elif isinstance(top_k, float):
+        top_k_int = int(top_k * len(importance_sorted_cols))
+        use_cols = importance_sorted_cols[:top_k_int]
+
+    return use_cols
 
 
 def remove_correlated_features(df: pd.DataFrame, features: List[str]):
