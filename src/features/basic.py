@@ -62,6 +62,9 @@ class Basic(Feature):
                 to_replace=2020.0, value=2017.0
             )
 
+        with timer("log_User_Count"):
+            total["log_User_Count"] = np.log1p(total["User_Count"].to_pandas())
+
         with timer("end"):
             basic_cols = [
                 "Name",
@@ -73,6 +76,7 @@ class Basic(Feature):
                 "Critic_Count",
                 "User_Score",
                 "User_Count",
+                "log_User_Count",
                 "Developer",
                 "Rating",
             ]

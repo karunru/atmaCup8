@@ -15,6 +15,7 @@ num_var_list = [
     "Critic_Count",
     "User_Score",
     "User_Count",
+    "log_User_Count",
 ]
 cat_var_list = ["Name", "Platform", "Genre", "Publisher", "Developer", "Rating"]
 num_stats_list = [

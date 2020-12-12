@@ -31,7 +31,9 @@ from src.features import (
     GroupbyGenre,
     AggSubTargetGroupbyTarget,
     GroupbyName,
-    GroupbyRating,ConcatCategory,GroupbyConcatCat,
+    GroupbyRating,
+    ConcatCategory,
+    GroupbyConcatCat,
     CategoryVectorization,
     GroupbyPlatform,
     GroupbyPublisher,
@@ -113,6 +115,8 @@ if __name__ == "__main__":
         with timer(name="load data"):
             train = cudf.read_feather(feature_dir / "Basic_train.ftr")
             test = cudf.read_feather(feature_dir / "Basic_test.ftr")
+            # train = cudf.read_feather(input_dir / "train.ftr")
+            # test = cudf.read_feather(input_dir / "test.ftr")
         with timer(name="generate features"):
             generate_features(
                 train_df=train,

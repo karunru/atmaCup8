@@ -6,13 +6,16 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 import cudf
+import numpy as np
 import pandas as pd
 from src.utils import reduce_mem_usage, timer
 from src.validation import default_feature_selector
-from src.validation.feature_selection import \
-    KarunruSpearmanCorrelationEliminator
-from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
-                   SpearmanCorrelationEliminator)
+from src.validation.feature_selection import KarunruSpearmanCorrelationEliminator
+from xfeat import (
+    ConstantFeatureEliminator,
+    DuplicatedFeatureEliminator,
+    SpearmanCorrelationEliminator,
+)
 
 
 class Feature(metaclass=abc.ABCMeta):
@@ -133,12 +136,10 @@ def load_features(config: dict) -> Tuple[cudf.DataFrame, cudf.DataFrame]:
         cols = []
         for feats in train_feats:
             cols = cols + feats.columns.tolist()
+
+        assert len(cols) == len(np.unique(cols))
         x_train = cudf.concat(
-            [
-                cudf.read_feather(f"{feature_path}/{f}_train.ftr")
-                for f in config["features"]
-                if Path(f"{feature_path}/{f}_train.ftr").exists()
-            ],
+            train_feats,
             axis=1,
             sort=False,
         ).to_pandas()

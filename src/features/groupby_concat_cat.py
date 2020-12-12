@@ -35,9 +35,6 @@ class GroupbyConcatCat(Feature):
             del train, test
             gc.collect()
 
-        with timer("log transform User_Count"):
-            total["log_User_Count"] = np.log1p(total["User_Count"].to_pandas())
-
         with timer("GroupbyTransformer"):
             num_var_list = [
                 "Critic_Score",
