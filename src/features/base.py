@@ -125,6 +125,14 @@ def load_features(config: dict) -> Tuple[cudf.DataFrame, cudf.DataFrame]:
     feature_path = config["dataset"]["feature_dir"]
 
     with timer("load train"):
+        train_feats = [
+            cudf.read_feather(f"{feature_path}/{f}_train.ftr")
+            for f in config["features"]
+            if Path(f"{feature_path}/{f}_train.ftr").exists()
+        ]
+        cols = []
+        for feats in train_feats:
+            cols = cols + feats.columns.tolist()
         x_train = cudf.concat(
             [
                 cudf.read_feather(f"{feature_path}/{f}_train.ftr")
