@@ -31,7 +31,7 @@ from src.features import (
     GroupbyGenre,
     AggSubTargetGroupbyTarget,
     GroupbyName,
-    GroupbyRating,
+    GroupbyRating,ConcatCategory,
     CategoryVectorization,
     GroupbyPlatform,
     GroupbyPublisher,

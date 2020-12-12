@@ -9,3 +9,4 @@ from .groupby_year import GroupbyYear
 from .groupby_rating import GroupbyRating
 from .category_vectorizer import CategoryVectorization
 from .agg_sub_target_groupby_category import AggSubTargetGroupbyTarget
+from .concat_category import ConcatCategory
