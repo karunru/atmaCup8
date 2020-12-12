@@ -26,17 +26,17 @@ from xfeat import (
 
 from src.evaluation import calc_metric, pr_auc
 from src.features import (
-    Basic,
-    GroupbyDeveloper,
-    GroupbyGenre,
     AggSubTargetGroupbyTarget,
-    GroupbyName,
-    GroupbyRating,
+    Basic,
+    CategoryVectorization,
     ConcatCategory,
     GroupbyConcatCat,
-    CategoryVectorization,
+    GroupbyDeveloper,
+    GroupbyGenre,
+    GroupbyName,
     GroupbyPlatform,
     GroupbyPublisher,
+    GroupbyRating,
     GroupbyYear,
     generate_features,
     load_features,
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
         cols: List[str] = x_train.columns.tolist()
         with timer("remove col"):
-            remove_cols = []
+            remove_cols = ["Developer", "Name"]
             target_cols = [
                 "NA_Sales",
                 "EU_Sales",
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
         with timer("Feature Selection by SpearmanCorrelationEliminator"):
             selector = KarunruSpearmanCorrelationEliminator(
-                threshold=0.99, dry_run=False
+                threshold=0.99, dry_run=True
             )
             x_train = selector.fit_transform(x_train)
             x_test = selector.transform(x_test)
