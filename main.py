@@ -194,6 +194,7 @@ if __name__ == "__main__":
 
         cols = x_train.columns.tolist()
         categorical_cols = [col for col in categorical_cols if col in cols]
+        categorical_cols = [col for col in categorical_cols if col != "Publisher"]
         config["categorical_cols"] = categorical_cols
         logging.info("Training with {} features".format(len(cols)))
 
