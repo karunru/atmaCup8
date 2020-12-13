@@ -1,0 +1,65 @@
+seed_everything: &seed 1031
+
+dataset:
+  dir: "input/"
+  feature_dir: "features"
+  params:
+
+features:
+  - Basic
+  - GroupbyPublisher
+  - GroupbyDeveloper
+  - GroupbyPlatform
+  - GroupbyGenre
+  - GroupbyYear
+  - GroupbyRating
+  - CategoryVectorization
+  - ConcatCategory
+  - GroupbyConcatCat
+
+target: "Global_Sales"
+
+feature_selection:
+  SpearmanCorrelation:
+    dryrun: True
+  top_k:
+    do: True
+    importance: "034_seed_average_033"
+    top_k: 0.1
+
+pre_process:
+  do: False
+  col: ""
+  xentropy: False
+
+post_process:
+  do: False
+  col: ""
+
+model:
+  name: "catboost"
+  mode: "regression"
+  model_params:
+    loss_function: "RMSE"
+    eval_metric: "RMSE"
+    task_type: "GPU"
+    devices: "0"
+    learning_rate: 0.01
+    iterations: 70000
+    random_seed: *seed
+    use_best_model: True
+    depth: 6
+    early_stopping_rounds: 1000
+
+  train_params:
+    mode: "regression"
+
+val:
+  name: "stratified_group_kfold"
+  params:
+    group: "Publisher"
+    target: "group"
+    n_splits: 5
+    random_state: *seed
+
+output_dir: "output"
