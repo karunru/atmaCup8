@@ -1,0 +1,83 @@
+seed_everything: &seed 49
+
+dataset:
+  dir: "input/"
+  feature_dir: "features"
+  params:
+
+features:
+  - Basic
+  - GroupbyPublisher
+  - GroupbyDeveloper
+  - GroupbyPlatform
+  - GroupbyGenre
+  - GroupbyYear
+  - GroupbyRating
+  - CategoryVectorization
+  - ConcatCategory
+  - GroupbyConcatCat
+
+target: "Global_Sales"
+
+feature_selection:
+  SpearmanCorrelation:
+    dryrun: True
+  top_k:
+    do: True
+    importance: "034_seed_average_033"
+    top_k: 0.1
+
+pre_process:
+  do: False
+  col: ""
+  xentropy: False
+
+post_process:
+  do: False
+  col: ""
+
+model:
+  name: "lgbm"
+  mode: "regression"
+  adaptive_learning_rate:
+    method: "halve_scheduler_func"
+    halve_iter: 200
+    warmup_iter: 100
+    start_lr: 0.08
+    min_lr: 0.007
+  model_params:
+    device_type: "gpu"
+    gpu_platform_id: 0
+    gpu_device_id: 0
+    objective: "regression"
+    metric: "rmse"
+    boosting_type: "gbdt"
+    max_depth: 6
+    learning_rate: 0.001
+    num_leaves: 63
+    tree_learner: "serial"
+    subsample: 0.95
+    subsample_freq: 1
+    colsample_bytree: 0.8
+    max_bin: 128
+    seed: *seed
+    bagging_seed: *seed
+    feature_fraction_seed: *seed
+    drop_seed: *seed
+    verbose: -1
+    first_metric_only: False
+
+  train_params:
+    num_boost_round: 100000
+    early_stopping_rounds: 1000
+    verbose_eval: 100
+
+val:
+  name: "stratified_group_kfold"
+  params:
+    group: "Publisher"
+    target: "group"
+    n_splits: 5
+    random_state: *seed
+
+output_dir: "output/037_use_top_10_seed_average_lgb"
