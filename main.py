@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
         cols: List[str] = x_train.columns.tolist()
         with timer("remove col"):
-            remove_cols = ["Developer", "Name"]
+            remove_cols = ["Publisher", "Developer"]
             target_cols = [
                 "NA_Sales",
                 "EU_Sales",
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     with timer("Feature Selection"):
         if config["feature_selection"]["top_k"]["do"]:
             use_cols = select_top_k_features(config["feature_selection"]["top_k"]) + [
-                "Publisher"
+                "Name"
             ]
             x_train, x_test = x_train[use_cols], x_test[use_cols]
         else:
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
         cols = x_train.columns.tolist()
         categorical_cols = [col for col in categorical_cols if col in cols]
-        categorical_cols = [col for col in categorical_cols if col != "Publisher"]
+        categorical_cols = [col for col in categorical_cols if col != "Name"]
         config["categorical_cols"] = categorical_cols
         logging.info("Training with {} features".format(len(cols)))
 
@@ -282,9 +282,9 @@ if __name__ == "__main__":
                 duplicates="drop",
             )
             splits = get_validation(x_train, config)
-            del x_train["target"], x_train["group"], x_train["Publisher"]
+            del x_train["target"], x_train["group"], x_train["Name"]
             gc.collect()
-            cols = [col for col in cols if col != "Publisher"]
+            cols = [col for col in cols if col != "Name"]
 
         model = get_model(config)
         (
