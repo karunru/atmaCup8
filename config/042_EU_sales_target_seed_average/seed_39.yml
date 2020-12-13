@@ -1,0 +1,74 @@
+seed_everything: &seed 39
+
+dataset:
+  dir: "input/"
+  feature_dir: "features"
+  params:
+
+features:
+  - Basic
+  - GroupbyPublisher
+  - GroupbyDeveloper
+  - GroupbyPlatform
+  - GroupbyGenre
+  - GroupbyYear
+  - GroupbyRating
+  - CategoryVectorization
+  - ConcatCategory
+  - GroupbyConcatCat
+
+target: "EU_Sales"
+target_encoding: False
+
+feature_selection:
+  SpearmanCorrelation:
+    dryrun: True
+  top_k:
+    do: True
+    importance: "034_seed_average_033"
+    top_k: 0.1
+
+pre_process:
+  do: False
+  col: ""
+  xentropy: False
+
+post_process:
+  do: False
+  col: ""
+
+model:
+  name: "xgb"
+  mode: "regression"
+
+  model_params:
+    objective: "reg:squarederror"
+    booster: "gbtree"
+    eval_metric: "rmse"
+    tree_method: "gpu_hist"
+    max_depth: 6
+    learning_rate: 0.01
+    n_estimators: 10000
+    min_child_weight: 1.0
+    gamma: 0.0
+    colsample_bytree: 0.7
+    colsample_bylevel: 0.3
+    reg_alpha: 0.0
+    reg_lambda: 1.0
+    verbosity: 0
+    seed: *seed
+    random_state: *seed
+
+  train_params:
+    early_stopping_rounds: 200
+    verbose: True
+
+val:
+  name: "stratified_group_kfold"
+  params:
+    group: "Publisher"
+    target: "group"
+    n_splits: 5
+    random_state: *seed
+
+output_dir: "output/042_EU_sales_target_seed_average"

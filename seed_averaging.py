@@ -36,7 +36,7 @@ if __name__ == "__main__":
         test_preds.append(np.load(test_pred))
     test_pred = np.mean(test_preds, axis=0)
 
-    with open(output / "seed_000/output.json") as f:
+    with open(np.sort(glob(str(output) + "/*/output.json"))[0]) as f:
         output_tmp_dict = json.load(f)
     feature_names = output_tmp_dict["eval_results"]["evals_result"][
         "feature_importance"
