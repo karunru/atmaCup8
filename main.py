@@ -35,9 +35,11 @@ from src.utils import (configure_logger, delete_duplicated_columns,
                        merge_by_concat, plot_feature_importance,
                        reduce_mem_usage, save_json, save_pickle,
                        seed_everything, slack_notify, timer)
-from src.validation import (default_feature_selector, get_validation,
-                            remove_correlated_features, remove_ks_features,KarunruSpearmanCorrelationEliminator,
+from src.validation import (KarunruSpearmanCorrelationEliminator,
+                            default_feature_selector, get_validation,
+                            remove_correlated_features, remove_ks_features,
                             select_top_k_features)
+from src.validation.feature_selection import KarunruConstantFeatureEliminator
 
 if __name__ == "__main__":
     # Set RMM to allocate all memory as managed memory (cudaMallocManaged underlying allocator)
@@ -113,6 +115,9 @@ if __name__ == "__main__":
         x_test.columns = [
             "".join(c if c.isalnum() else "_" for c in str(x)) for x in x_test.columns
         ]
+        categorical_cols = x_train.select_dtypes("category").columns
+        x_train = x_train.to_pandas()
+        x_test = x_test.to_pandas()
 
     with timer("delete duplicated columns"):
         x_train = delete_duplicated_columns(x_train)
@@ -162,7 +167,7 @@ if __name__ == "__main__":
             x_train, x_test = x_train[use_cols], x_test[use_cols]
         else:
             with timer("Feature Selection by ConstantFeatureEliminator"):
-                selector = ConstantFeatureEliminator()
+                selector = KarunruConstantFeatureEliminator()
                 x_train = selector.fit_transform(x_train)
                 x_test = selector.transform(x_test)
                 assert len(x_train.columns) == len(x_test.columns)
@@ -188,7 +193,7 @@ if __name__ == "__main__":
             #     cols = [col for col in cols if col not in to_remove]
 
         cols = x_train.columns.tolist()
-        categorical_cols = x_train.select_dtypes(include="category").columns.tolist()
+        categorical_cols = [col for col in categorical_cols if col in cols]
         config["categorical_cols"] = categorical_cols
         logging.info("Training with {} features".format(len(cols)))
 

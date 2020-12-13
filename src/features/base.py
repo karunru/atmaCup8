@@ -7,14 +7,10 @@ from typing import Optional, Tuple
 
 import cudf
 import numpy as np
-import pandas as pd
 from src.utils import reduce_mem_usage, timer
-from src.validation import default_feature_selector
-from src.validation.feature_selection import KarunruSpearmanCorrelationEliminator
-from xfeat import (
-    ConstantFeatureEliminator,
-    DuplicatedFeatureEliminator,
-    SpearmanCorrelationEliminator,
+from src.validation.feature_selection import (
+    KarunruSpearmanCorrelationEliminator,
+    KarunruConstantFeatureEliminator,
 )
 
 
@@ -50,7 +46,7 @@ class Feature(metaclass=abc.ABCMeta):
                     "Global_Sales",
                 ]
                 with timer("ConstantFeatureEliminator"):
-                    selector = ConstantFeatureEliminator()
+                    selector = KarunruConstantFeatureEliminator()
                     self.train = selector.fit_transform(self.train)
                     selector._selected_cols = [
                         col for col in selector._selected_cols if col not in target_cols
@@ -142,7 +138,7 @@ def load_features(config: dict) -> Tuple[cudf.DataFrame, cudf.DataFrame]:
             train_feats,
             axis=1,
             sort=False,
-        ).to_pandas()
+        )
         # x_train = pd.concat(
         #     [
         #         pd.read_feather(f"{feature_path}/{f}_train.ftr")
@@ -162,7 +158,7 @@ def load_features(config: dict) -> Tuple[cudf.DataFrame, cudf.DataFrame]:
             ],
             axis=1,
             sort=False,
-        ).to_pandas()
+        )
         # x_test = pd.concat(
         #     [
         #         pd.read_feather(f"{feature_path}/{f}_test.ftr")

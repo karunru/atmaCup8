@@ -48,7 +48,7 @@ class Basic(Feature):
                 for col in cat_cols:
                     le = LabelEncoder(handle_unknown="ignore")
                     le.fit(total[col])
-                    total[col] = le.transform(total[col])
+                    total[col] = le.transform(total[col]).astype("category")
 
         with timer("User_Score"):
             total["User_Score"] = (

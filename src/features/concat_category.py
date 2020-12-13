@@ -46,7 +46,7 @@ class ConcatCategory(Feature):
 
             for col in new_cat_df.columns:
                 le = LabelEncoder()
-                new_cat_df[col] = le.fit_transform(new_cat_df[col])
+                new_cat_df[col] = le.fit_transform(new_cat_df[col]).astype("category")
 
             total = cudf.concat(
                 [total, new_cat_df],

@@ -4,7 +4,7 @@ import re
 from abc import ABC
 from collections import defaultdict
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import cudf
 import numpy as np
@@ -12,8 +12,12 @@ import pandas as pd
 from scipy.stats import ks_2samp
 from src.utils import load_pickle, logger, save_pickle
 from tqdm import tqdm
-from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
-                   Pipeline, SpearmanCorrelationEliminator)
+from xfeat import (
+    ConstantFeatureEliminator,
+    DuplicatedFeatureEliminator,
+    Pipeline,
+    SpearmanCorrelationEliminator,
+)
 from xfeat.base import SelectorMixin
 from xfeat.types import XDataFrame
 
@@ -208,6 +212,84 @@ class KarunruSpearmanCorrelationEliminator(SelectorMixin):
     def fit_transform(self, input_df: XDataFrame) -> XDataFrame:
         self.fit(input_df)
         return self.transform(input_df)
+
+
+def karunru_analyze_columns(input_df: XDataFrame) -> Tuple[List[str], List[str]]:
+    """Classify columns to numerical or categorical.
+
+    Args:
+        input_df (XDataFrame) : Input data frame.
+    Returns:
+        Tuple[List[str], List[str]] : List of num cols and cat cols.
+
+    Example:
+        ::
+            >>> import pandas as pd
+            >>> from xfeat.utils import analyze_columns
+            >>> df = pd.DataFrame({"col1": [1, 2], "col2": [2, 3], "col3": ["a", "b"]})
+            >>> analyze_columns(df)
+            (['col1', 'col2'], ['col3'])
+    """
+    numerical_cols = []
+    categorical_cols = input_df.select_dtypes("category").columns.tolist()
+    for col in [col for col in input_df.columns if col not in categorical_cols]:
+        if pd.api.types.is_numeric_dtype(input_df[col]):
+            numerical_cols.append(col)
+        else:
+            categorical_cols.append(col)
+    return numerical_cols, categorical_cols
+
+
+class KarunruConstantFeatureEliminator(SelectorMixin):
+    """Remove constant features."""
+
+    def __init__(self):
+        """[summary]."""
+        self._selected_cols = []
+
+    def fit_transform(self, input_df: XDataFrame) -> XDataFrame:
+        """Fit to data frame, then transform it.
+
+        Args:
+            input_df (XDataFrame): Input data frame.
+        Returns:
+            XDataFrame : Output data frame.
+        """
+        num_cols, cat_cols = karunru_analyze_columns(input_df)
+
+        constant_cols = []
+        for col in input_df.columns:
+            if col in num_cols:
+                if input_df[col].std() > 0:
+                    continue
+                value_count = input_df[col].count()
+                if value_count == len(input_df) or value_count == 0:
+                    constant_cols.append(col)
+
+            elif col in cat_cols:
+                value_count = input_df[col].count()
+                if input_df[col].unique().shape[0] == 1 or value_count == 0:
+                    constant_cols.append(col)
+
+            else:
+                # All nan values, like as [np.nan, np.nan, np.nan, np.nan, ...]
+                constant_cols.append(col)
+
+        self._selected_cols = [
+            col for col in input_df.columns if col not in constant_cols
+        ]
+
+        return input_df[self._selected_cols]
+
+    def transform(self, input_df: XDataFrame) -> XDataFrame:
+        """Transform data frame.
+
+        Args:
+            input_df (XDataFrame): Input data frame.
+        Returns:
+            XDataFrame : Output data frame.
+        """
+        return input_df[self._selected_cols]
 
 
 def default_feature_selector():
