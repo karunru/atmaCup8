@@ -18,27 +18,56 @@ import seaborn as sns
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
-from xfeat import (ConstantFeatureEliminator, DuplicatedFeatureEliminator,
-                   SpearmanCorrelationEliminator)
+from xfeat import (
+    ConstantFeatureEliminator,
+    DuplicatedFeatureEliminator,
+    SpearmanCorrelationEliminator,
+)
 
 from src.evaluation import calc_metric, pr_auc
-from src.features import (AggSubTargetGroupbyTarget, Basic,
-                          CategoryVectorization, ConcatCategory,
-                          GroupbyConcatCat, GroupbyDeveloper, GroupbyGenre,
-                          GroupbyName, GroupbyPlatform, GroupbyPublisher,
-                          GroupbyRating, GroupbyYear, generate_features,
-                          load_features)
+from src.features import (
+    AggSubTargetGroupbyTarget,
+    Basic,
+    CategoryVectorization,
+    ConcatCategory,
+    GroupbyConcatCat,
+    GroupbyDeveloper,
+    GroupbyGenre,
+    GroupbyName,
+    GroupbyPlatform,
+    GroupbyPublisher,
+    GroupbyRating,
+    GroupbyYear,
+    generate_features,
+    SerialNumPer,
+    load_features,
+)
 from src.models import get_model
-from src.utils import (configure_logger, delete_duplicated_columns,
-                       feature_existence_checker, get_preprocess_parser,
-                       load_config, load_pickle, make_submission,
-                       merge_by_concat, plot_feature_importance,
-                       reduce_mem_usage, save_json, save_pickle,
-                       seed_everything, slack_notify, timer)
-from src.validation import (KarunruSpearmanCorrelationEliminator,
-                            default_feature_selector, get_validation,
-                            remove_correlated_features, remove_ks_features,
-                            select_top_k_features)
+from src.utils import (
+    configure_logger,
+    delete_duplicated_columns,
+    feature_existence_checker,
+    get_preprocess_parser,
+    load_config,
+    load_pickle,
+    make_submission,
+    merge_by_concat,
+    plot_feature_importance,
+    reduce_mem_usage,
+    save_json,
+    save_pickle,
+    seed_everything,
+    slack_notify,
+    timer,
+)
+from src.validation import (
+    KarunruSpearmanCorrelationEliminator,
+    default_feature_selector,
+    get_validation,
+    remove_correlated_features,
+    remove_ks_features,
+    select_top_k_features,
+)
 from src.validation.feature_selection import KarunruConstantFeatureEliminator
 
 if __name__ == "__main__":
@@ -139,7 +168,7 @@ if __name__ == "__main__":
 
         cols: List[str] = x_train.columns.tolist()
         with timer("remove col"):
-            remove_cols = ["Publisher", "Developer"]
+            remove_cols = ["Developer", "Name"]
             target_cols = [
                 "NA_Sales",
                 "EU_Sales",
@@ -162,7 +191,7 @@ if __name__ == "__main__":
     with timer("Feature Selection"):
         if config["feature_selection"]["top_k"]["do"]:
             use_cols = select_top_k_features(config["feature_selection"]["top_k"]) + [
-                "Name"
+                "Publisher"
             ]
             x_train, x_test = x_train[use_cols], x_test[use_cols]
         else:
@@ -194,7 +223,7 @@ if __name__ == "__main__":
 
         cols = x_train.columns.tolist()
         categorical_cols = [col for col in categorical_cols if col in cols]
-        categorical_cols = [col for col in categorical_cols if col != "Name"]
+        categorical_cols = [col for col in categorical_cols if col != "Publisher"]
         config["categorical_cols"] = categorical_cols
         logging.info("Training with {} features".format(len(cols)))
 
@@ -282,9 +311,9 @@ if __name__ == "__main__":
                 duplicates="drop",
             )
             splits = get_validation(x_train, config)
-            del x_train["target"], x_train["group"], x_train["Name"]
+            del x_train["target"], x_train["group"], x_train["Publisher"]
             gc.collect()
-            cols = [col for col in cols if col != "Name"]
+            cols = [col for col in cols if col != "Publisher"]
 
         model = get_model(config)
         (
